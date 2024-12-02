@@ -6,4 +6,10 @@ internal static class InputUtils
     {
         return [.. input.Split("\r\n")];
     }
+
+    internal static List<int> SplitOnNewlines<T>(this string input)
+        where T : struct
+    {
+        return [.. input.Split("\n\r").Select(i => Convert.ToInt32(i))];
+    }
 }

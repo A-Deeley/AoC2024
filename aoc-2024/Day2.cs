@@ -9,5 +9,8 @@ namespace aoc_2024;
 
 public class Day2(IPuzzleInputReader reader)
 {
-
+    public object RunPart1()
+    {
+        return 0;
+    }
 }
