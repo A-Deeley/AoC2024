@@ -12,7 +12,7 @@ public class Day1(IPuzzleInputReader reader)
 {
     readonly List<string> input = reader.GetPuzzleInput(1).SplitOnNewlines();
 
-    public string RunPart1()
+    public object RunPart1()
     {
         var t = input.Select(i =>
         {
@@ -31,7 +31,7 @@ public class Day1(IPuzzleInputReader reader)
         return totalDistance.ToString();
     }
 
-    public string RunPart2()
+    public object RunPart2()
     {
         var t = input.Select(i =>
         {
