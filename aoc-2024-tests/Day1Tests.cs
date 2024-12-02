@@ -6,7 +6,7 @@ namespace aoc_2024_tests;
 
 public class Day1Tests
 {
-    readonly IPuzzleInputReader _inputReader;
+    readonly Day1 day;
     readonly string sample =
         """
         3   4
@@ -19,23 +19,21 @@ public class Day1Tests
 
     public Day1Tests()
     {
-        _inputReader = Substitute.For<IPuzzleInputReader>();
-        _inputReader.GetPuzzleInput(1).Returns(sample);
+        var inputReader = Substitute.For<IPuzzleInputReader>();
+        inputReader.GetPuzzleInput(1).Returns(sample);
+
+        day = new(inputReader);
     }
 
     [Fact]
     public void TestPart1()
     {
-        Day1 day = new(_inputReader);
-
         Assert.Equal("11", day.RunPart1());
     }
 
     [Fact]
     public void TestPart2()
     {
-        Day1 day = new(_inputReader);
-
         Assert.Equal("31", day.RunPart2());
     }
 }
