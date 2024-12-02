@@ -7,12 +7,13 @@ using static System.Environment;
 
 namespace aoc_2024.IO;
 
-public class FilePuzzleInputReader(string? directory = null) : IPuzzleInputReader
+public class FilePuzzleInputReader(string? directory = null, int? year = null) : IPuzzleInputReader
 {
-    readonly string currentYearDirectory = directory ?? Path.Combine(GetFolderPath(SpecialFolder.MyDocuments), "AdventOfCode/2024");
+    readonly string currentYearDirectory = directory ?? Path.Combine(GetFolderPath(SpecialFolder.MyDocuments), $"AdventOfCode");
 
     public string GetPuzzleInput(int day)
     {
-        return File.ReadAllText(Path.Combine(currentYearDirectory, $"{day}.txt")).Trim();
+        year ??= DateTime.Now.Year;
+        return File.ReadAllText(Path.Combine(currentYearDirectory, $"{year}/{day}.txt")).Trim();
     }
 }
