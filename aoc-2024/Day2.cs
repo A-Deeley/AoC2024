@@ -27,7 +27,7 @@ public class Day2(IPuzzleInputReader reader)
 
                 int current = report[i];
 
-                var newDir = ComparePrevious(prev, current);
+                var newDir = ComparePreviousForDirection(prev, current);
 
                 if (dir is null)
                     dir = newDir;
@@ -69,67 +69,76 @@ public class Day2(IPuzzleInputReader reader)
         for (int reportIndex = 0; reportIndex < reports.Count; reportIndex++)
         {
             List<int>? report = reports[reportIndex];
-            Direction? dir = null;
-            int prev = 0;
-            int safe = 1;
-
-            for (int i = 0; i < report.Count; i++)
+            Direction? trend = ComparePreviousForDirection(report[0], report[1]);
+            int? unsafeIndex = trend == Direction.Neutral ? 0 : null;
+            bool removedLevel = unsafeIndex is not null;
+            if (unsafeIndex is not null)
             {
-                if (i == 0)
-                {
-                    prev = report[i];
-                    continue;
-                }
-
-                int current = report[i];
-
-                var newDir = ComparePrevious(prev, current);
-
-                if (dir is null)
-                    dir = newDir;
-                else if (newDir != dir)
-                {
-                    prev = report[i];
-                    if (safe-- == 0)
-                        break;
-                    else
-                        safe--;
-                }
-
-                var delta = Math.Abs(prev - current);
-
-                if (delta == 0)
-                {
-                    prev = report[i];
-                    if (safe-- == 0)
-                        break;
-                    else
-                        safe--;
-                }
-
-                if (delta > 3)
-                {
-                    prev = report[i];
-                    if (safe-- == 0)
-                        break;
-                    else
-                        safe--;
-                }
-
-                prev = safe == 1 ? report[i] : prev;
+                report = report[1..];
+                unsafeIndex = null;
             }
-            reportStates.Add(reportIndex, safe >= 0);
+
+            for (int i = 0; i < report.Count - 1; i++)
+            {
+                int current = report[i];
+                int next = report[i + 1];
+                bool rebreak = false;
+
+                if (trend != ComparePreviousForDirection(current, next))
+                    unsafeIndex = i;
+
+                if (!DeltaIsValid(current, next))
+                    unsafeIndex = i;
+
+                while (!removedLevel && unsafeIndex is int index)
+                {
+                    List<int> reportCopy = [.. report];
+                    reportCopy.RemoveAt(index);
+
+                    for (int j = 0; j < reportCopy.Count - 1; j++)
+                    {
+                        int _current = reportCopy[j];
+                        int _next = reportCopy[j + 1];
+
+                        if (trend != ComparePreviousForDirection(_current, _next))
+                            rebreak = true;
+
+                        if (!DeltaIsValid(_current, _next))
+                            rebreak = true;
+                    }
+
+                    if (rebreak)
+                        break;
+                    else
+                        unsafeIndex = null;
+                }
+
+                if (removedLevel && rebreak)
+                    break;
+                else if (rebreak)
+                    removedLevel = true;
+
+            }
+
+            reportStates.Add(reportIndex, !removedLevel || (removedLevel && unsafeIndex == null));
         }
         return reportStates.Count(kvPair => kvPair.Value);
     }
 
-    static Direction ComparePrevious(int prev, int current)
+    static Direction ComparePreviousForDirection(int prev, int current)
     {
         if (prev < current) return Direction.Increasing;
 
         if (prev == current) return Direction.Neutral;
 
         return Direction.Decreasing;
+    }
+
+    static bool DeltaIsValid(int prev, int current)
+    {
+        int delta = Math.Abs(prev - current);
+
+        return 0 < delta && delta <= 3;
     }
 }
 

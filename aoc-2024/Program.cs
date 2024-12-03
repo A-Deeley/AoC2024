@@ -12,5 +12,5 @@ IPuzzleInputReader reader = new FilePuzzleInputReader("C:/AdventOfCode", 2024);
 Day2 day2 = new(reader);
 Console.WriteLine("Day2");
 Console.WriteLine($"\tPart 1: {day2.RunPart1()}");
-//Console.WriteLine($"\tPart 2: {day2.RunPart2()}");
+Console.WriteLine($"\tPart 2: {day2.RunPart2()}");
 Console.WriteLine();
