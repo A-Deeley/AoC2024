@@ -24,7 +24,7 @@ public partial class Day4(IPuzzleInputReader reader)
                     for (int dir = -1; dir < 2; dir++)
                     {
                         int difference = -xsize + dir;
-                        if (currentIndex + difference < 0 || currentIndex + difference >= puzzle.Count) continue;
+                        if (difference + x > xsize || currentIndex + difference < 0 || currentIndex + difference >= puzzle.Count) continue;
 
                         bool xmasFound = ContainsXMASPart(puzzle, currentIndex, difference, xsize, 1);
                         if (xmasFound) indexesThatStartXmas.Add(currentIndex);
@@ -33,7 +33,7 @@ public partial class Day4(IPuzzleInputReader reader)
                     // Check adjacent { -1, +1 }
                     for (int dir = -1; dir < 2; dir+=2)
                     {
-                        if (currentIndex + dir < 0 || currentIndex + dir >= puzzle.Count) continue;
+                        if (dir + x > xsize || currentIndex + dir < 0 || currentIndex + dir >= puzzle.Count) continue;
 
                         bool xmasFound = ContainsXMASPart(puzzle, currentIndex, dir, xsize, 1);
                         if (xmasFound) indexesThatStartXmas.Add(currentIndex);
@@ -43,7 +43,7 @@ public partial class Day4(IPuzzleInputReader reader)
                     for (int dir = -1; dir < 2; dir++)
                     {
                         int difference = xsize + dir;
-                        if (currentIndex + difference < 0 || currentIndex + difference >= puzzle.Count) continue;
+                        if (difference + x > xsize || currentIndex + difference < 0 || currentIndex + difference >= puzzle.Count) continue;
 
                         bool xmasFound = ContainsXMASPart(puzzle, currentIndex, difference, xsize, 1);
                         if (xmasFound) indexesThatStartXmas.Add(currentIndex);
