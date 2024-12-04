@@ -7,145 +7,95 @@ public class Day2(IPuzzleInputReader reader)
 {
     public object RunPart1()
     {
-        List<List<int>> reports = reader.GetPuzzleInput(2).SplitOnNewlines().Select(i => i.Split(" ").Select(i => Convert.ToInt32(i)).ToList()).ToList();
-        Dictionary<int, bool> reportStates = new();
+        List<Record> reports = GetReports();
 
-        for (int reportIndex = 0; reportIndex < reports.Count; reportIndex++)
-        {
-            List<int>? report = reports[reportIndex];
-            Direction? dir = null;
-            int prev = 0;
-            bool safe = true;
+        var safeReports = reports
+            .Where(r => r.IsSafe);
 
-            for (int i = 0; i < report.Count; i++)
-            {
-                if (i == 0)
-                {
-                    prev = report[i];
-                    continue;
-                }
-
-                int current = report[i];
-
-                var newDir = ComparePreviousForDirection(prev, current);
-
-                if (dir is null)
-                    dir = newDir;
-                else if (newDir != dir)
-                {
-                    prev = report[i];
-                    safe = false;
-                    break;
-                }
-
-                var delta = Math.Abs(prev - current);
-
-                if (delta == 0)
-                {
-                    prev = report[i];
-                    safe = false;
-                    break;
-                }
-
-                if (delta > 3)
-                {
-                    prev = report[i];
-                    safe = false;
-                    break;
-                }
-
-                prev = report[i];
-            }
-            reportStates.Add(reportIndex, safe);
-        }
-        return reportStates.Count(kvPair => kvPair.Value);
+        return safeReports.Count();
     }
 
     public object RunPart2()
     {
-        List<List<int>> reports = reader.GetPuzzleInput(2).SplitOnNewlines().Select(i => i.Split(" ").Select(i => Convert.ToInt32(i)).ToList()).ToList();
-        Dictionary<int, bool> reportStates = new();
+        List<Record> reports = GetReports();
 
-        for (int reportIndex = 0; reportIndex < reports.Count; reportIndex++)
+        var safeReports = reports
+            .Where(r => r.IsSafe);
+
+        var unsafeReports = reports
+            .Where(r => !r.IsSafe);
+
+        
+
+        return 0;
+    }
+
+    List<Record> GetReports() => reader
+            .GetPuzzleInput(2)
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries & StringSplitOptions.TrimEntries)
+            .Select(i => new Record(i))
+            .ToList();
+}
+
+public class Record
+{
+    public Record(string line)
+    {
+        Levels = GetValuePairs(line.Split().Select(l => Convert.ToInt32(l)).ToList());
+        IsSafe = AllDeltasSafe() && AllSameTrend();
+    }
+
+    public List<ValuePair> Levels { get; set; }
+
+    public bool IsSafe { get; set; }
+
+    bool AllDeltasSafe() => Levels.All(l => l.IsDeltaValid);
+
+    bool AllSameTrend() => Levels.All(l => l.Trend == Trend.Increasing) || Levels.All(l => l.Trend == Trend.Decreasing);
+
+    List<ValuePair> GetValuePairs(List<int> levels)
+    {
+        List<ValuePair> pairs = new List<ValuePair>();
+        for (int i = 0; i < levels.Count - 1; i++)
         {
-            List<int>? report = reports[reportIndex];
-            Direction? trend = ComparePreviousForDirection(report[0], report[1]);
-            int? unsafeIndex = trend == Direction.Neutral ? 0 : null;
-            bool removedLevel = unsafeIndex is not null;
-            if (unsafeIndex is not null)
-            {
-                report = report[1..];
-                unsafeIndex = null;
-            }
-
-            for (int i = 0; i < report.Count - 1; i++)
-            {
-                int current = report[i];
-                int next = report[i + 1];
-                bool rebreak = false;
-
-                if (trend != ComparePreviousForDirection(current, next))
-                    unsafeIndex = i;
-
-                if (!DeltaIsValid(current, next))
-                    unsafeIndex = i;
-
-                while (!removedLevel && unsafeIndex is int index)
-                {
-                    List<int> reportCopy = [.. report];
-                    reportCopy.RemoveAt(index);
-
-                    for (int j = 0; j < reportCopy.Count - 1; j++)
-                    {
-                        int _current = reportCopy[j];
-                        int _next = reportCopy[j + 1];
-
-                        if (trend != ComparePreviousForDirection(_current, _next))
-                            rebreak = true;
-
-                        if (!DeltaIsValid(_current, _next))
-                            rebreak = true;
-                    }
-
-                    if (rebreak)
-                        break;
-                    else
-                        unsafeIndex = null;
-                }
-
-                if (removedLevel && rebreak)
-                    break;
-                else if (rebreak)
-                    removedLevel = true;
-
-            }
-
-            reportStates.Add(reportIndex, !removedLevel || (removedLevel && unsafeIndex == null));
+            pairs.Add(new(levels[i], levels[i + 1]));
         }
-        return reportStates.Count(kvPair => kvPair.Value);
-    }
 
-    static Direction ComparePreviousForDirection(int prev, int current)
-    {
-        if (prev < current) return Direction.Increasing;
-
-        if (prev == current) return Direction.Neutral;
-
-        return Direction.Decreasing;
-    }
-
-    static bool DeltaIsValid(int prev, int current)
-    {
-        int delta = Math.Abs(prev - current);
-
-        return 0 < delta && delta <= 3;
+        return pairs;
     }
 }
 
+public struct ValuePair(int a, int b)
+{
+    public int First { get; set; } = a;
+    public int Second { get; set; } = b;
 
+    int _delta = a - b;
 
+    public readonly bool IsDeltaValid
+    {
+        get
+        {
+            int abs = Math.Abs(_delta);
+            return abs > 0 && abs <= 3;
+        }
+    }
+    
+    public readonly Trend Trend
+    {
+        get
+        {
+            if (_delta < 0)
+                return Trend.Increasing;
+            else if (_delta > 0)
+                return Trend.Decreasing;
+            else
+                return Trend.Neutral;
+        }
+    }
+}
 
-public enum Direction
+public enum Trend
 {
     Increasing,
     Neutral,
