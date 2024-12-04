@@ -17,17 +17,37 @@ public class Day2(IPuzzleInputReader reader)
 
     public object RunPart2()
     {
-        List<Record> reports = GetReports();
+        List<string> reports = reader
+            .GetPuzzleInput(2)
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries & StringSplitOptions.TrimEntries)
+            .ToList();
 
-        var safeReports = reports
-            .Where(r => r.IsSafe);
+        int safeReports = 0;
+        foreach (var report in reports) // For each row
+        {
+            bool atLeastOneVersionSafe = false;
+            int len = report.Split().Length;
+            for (int iter = 0; iter < len; iter++) // Try removing each character once and testing
+            { 
+                if (atLeastOneVersionSafe)
+                    break;
+                List<int> reportTrimmed = report.Split().Select(int.Parse).ToList();
+                reportTrimmed.RemoveAt(iter);
+                List<ValuePair> pairs = new List<ValuePair>();
+                for (int i = 0; i < reportTrimmed.Count - 1; i++)
+                {
+                    pairs.Add(new(reportTrimmed[i], reportTrimmed[i + 1]));
+                }
 
-        var unsafeReports = reports
-            .Where(r => !r.IsSafe);
+                if (pairs.All(l => l.IsDeltaValid) && (pairs.All(l => l.Trend == Trend.Increasing) || pairs.All(l => l.Trend == Trend.Decreasing)))
+                    atLeastOneVersionSafe = true;
+            }
 
-        
+            if (atLeastOneVersionSafe)
+                safeReports++;
+        }
 
-        return 0;
+        return safeReports;
     }
 
     List<Record> GetReports() => reader
@@ -65,12 +85,26 @@ public class Record
     }
 }
 
-public struct ValuePair(int a, int b)
+public struct ValuePair
 {
-    public int First { get; set; } = a;
-    public int Second { get; set; } = b;
+    public ValuePair(int a, int b)
+    {
+        First = a;
+        Second = b;
+        _delta = a - b;
+    }
 
-    int _delta = a - b;
+    public ValuePair(double a, double b)
+    {
+        First = (int)a;
+        Second = (int)b;
+        _delta = First - Second;
+    }
+
+    public int First { get; set; }
+    public int Second { get; set; }
+
+    int _delta;
 
     public readonly bool IsDeltaValid
     {
