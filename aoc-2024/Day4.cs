@@ -24,7 +24,9 @@ public partial class Day4(IPuzzleInputReader reader)
                     for (int dir = -1; dir < 2; dir++)
                     {
                         int difference = -xsize + dir;
-                        if (difference + x > xsize || currentIndex + difference < 0 || currentIndex + difference >= puzzle.Count) continue;
+                        if (currentIndex + difference < 0 || currentIndex + difference >= puzzle.Count) continue;
+                        if (x == 0 && difference < -xsize) continue;
+                        if (x == xsize - 1 && difference > -xsize) continue;
 
                         bool xmasFound = ContainsXMASPart(puzzle, currentIndex, difference, xsize, 1);
                         if (xmasFound) indexesThatStartXmas.Add(currentIndex);
@@ -33,7 +35,9 @@ public partial class Day4(IPuzzleInputReader reader)
                     // Check adjacent { -1, +1 }
                     for (int dir = -1; dir < 2; dir+=2)
                     {
-                        if (dir + x > xsize || currentIndex + dir < 0 || currentIndex + dir >= puzzle.Count) continue;
+                        if (currentIndex + dir < 0 || currentIndex + dir >= puzzle.Count) continue;
+                        if (x == 0 && dir < x) continue;
+                        if (x == xsize - 1 && dir + x >= xsize) continue;
 
                         bool xmasFound = ContainsXMASPart(puzzle, currentIndex, dir, xsize, 1);
                         if (xmasFound) indexesThatStartXmas.Add(currentIndex);
@@ -43,7 +47,9 @@ public partial class Day4(IPuzzleInputReader reader)
                     for (int dir = -1; dir < 2; dir++)
                     {
                         int difference = xsize + dir;
-                        if (difference + x > xsize || currentIndex + difference < 0 || currentIndex + difference >= puzzle.Count) continue;
+                        if (currentIndex + difference < 0 || currentIndex + difference >= puzzle.Count) continue;
+                        if (x == 0 && difference < xsize) continue;
+                        if (x == xsize - 1 && difference > xsize) continue;
 
                         bool xmasFound = ContainsXMASPart(puzzle, currentIndex, difference, xsize, 1);
                         if (xmasFound) indexesThatStartXmas.Add(currentIndex);
@@ -64,6 +70,8 @@ public partial class Day4(IPuzzleInputReader reader)
 
         // If we would be to exit the bounds of the array, the word cannot be completed.
         if (nextCurrentIndex < 0 || nextCurrentIndex >= arr.Count) return false;
+        if (currentIndex % xsize == 0 && (indexDelta < -xsize || indexDelta == xsize - 1)) return false;
+        if (currentIndex % xsize == xsize - 1 && (indexDelta > xsize || indexDelta == -xsize + 1)) return false;
 
         if (arr[nextCurrentIndex] == xmas[xmasIndex]) return ContainsXMASPart(arr, nextCurrentIndex, indexDelta, xsize, ++xmasIndex);
 

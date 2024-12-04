@@ -19,11 +19,25 @@ public class Day4Tests
 
 
     [Fact]
-    public void TestPart1()
+    public void TestPart1_ProvidedSample_ReturnsProvidedAnswer()
     {
         var actual = day.RunPart1();
 
         Assert.Equal(18, actual);
+    }
+
+    [Fact]
+    public void TestPart1_BoundaryEdgeCase_DoesNotReturnFalseXmas()
+    {
+        string sample = "XXXX\nXXXM\nXXXX\nAXXX\nXSXX";
+        IPuzzleInputReader _reader = Substitute.For<IPuzzleInputReader>();
+        _reader.GetPuzzleInput(4).Returns(sample);
+        Day4 _day = new(_reader);
+
+
+        var actual = _day.RunPart1();
+
+        Assert.Equal(0, actual);
     }
 
     [Fact]
