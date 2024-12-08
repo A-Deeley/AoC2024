@@ -41,11 +41,26 @@ public class Day4Tests
     }
 
     [Fact]
-    public void TestPart2()
+    public void TestPart1_HorizontalEdgeCase_DoesNotReturnFalseXmas()
+    {
+        string sample = "XXXXM\nASXSA\nMXXXX";
+
+        IPuzzleInputReader _reader = Substitute.For<IPuzzleInputReader>();
+        _reader.GetPuzzleInput(4).Returns(sample);
+
+        Day4 _day = new(_reader);
+
+        var actual = _day.RunPart1();
+
+        Assert.Equal(0, actual);
+    }
+
+    [Fact]
+    public void TestPart2_ProvidedSample_ReturnsProvidedAnswer()
     {
 
         var actual = day.RunPart2();
 
-        Assert.Null(actual);
+        Assert.Equal(9, actual);
     }
 }

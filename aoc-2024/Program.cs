@@ -24,5 +24,5 @@ Console.WriteLine();
 Day4 day4 = new(reader);
 Console.WriteLine("Day4");
 Console.WriteLine($"\tPart 1: {day4.RunPart1()}");
-//Console.WriteLine($"\tPart 2: {day3.RunPart2()}");
+Console.WriteLine($"\tPart 2: {day4.RunPart2()}");
 Console.WriteLine();
